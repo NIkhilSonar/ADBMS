@@ -1,0 +1,37 @@
+BEGIN
+ DBMS_REDACT.ALTER_POLICY(
+  object_schema => 'db281',
+  object_name => 'staff',
+  policy_name => 'db281_staff',
+  action => DBMS_REDACT.MODIFY_COLUMN,
+  column_name => 'ssn',
+  function_type => DBMS_REDACT.PARTIAL,
+  function_parameters => DBMS_REDACT.REDACT_US_SSN_F5);
+END;
+/
+
+EXEC DBMS_REDACT.DROP_POLICY ('db281', 'staff', 'dbtest_staff');
+
+BEGIN
+ DBMS_REDACT.ADD_POLICY(
+  object_schema => 'db281',
+  object_name => 'staff',
+  column_name => 'ssn',
+  policy_name => 'db281_staff',
+  function_type => DBMS_REDACT.FULL,
+  function_parameters => '',
+  expression => '1=1',
+  policy_description => 'Redacts STAFF.',
+  column_description => 'ssn contains Social Security Information');
+END;
+/
+
+
+SELECT * FROM redaction_policies WHERE object_owner LIKE 'DB281';
+
+SELECT * FROM redaction_columns WHERE object_owner LIKE 'DB281';
+
+EXEC DBMS_REDACT.DISABLE_POLICY ('db281', 'staff', 'dbtest_staff');
+
+SELECT * FROM redaction_values_for_type_full;
+select * from staff;
